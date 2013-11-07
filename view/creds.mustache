@@ -1,0 +1,325 @@
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="/javascript/bootstrap.min.js"></script>
+
+<script language="javascript">
+
+jQuery(document).ready(function(e)
+{
+	warnRef= jQuery("#warn");
+	resultRef = jQuery("#result");
+	progressRef = jQuery("#progress");
+	controlRef = jQuery("#controls");
+	ctype = "user";
+	cid = "0";
+	tick = 0;
+	pbuff = "";
+	rbuff = "";
+
+	warn = function(type, id)
+	{
+		ctype = type;
+		cid = id;
+		tick = 0;
+		h = jQuery(document).scrollTop();
+		y = h +120;
+		w = jQuery(document).width();
+		x = (w -warnRef.width()) /2;
+		pbuff = "";
+		rbuff = "";
+		warnRef.css("left", x +"px");
+		warnRef.css("top", y +"px");
+		resultRef.html("");
+		progressRef.html("");
+		warnRef.css("visibility", "visible");
+	}
+
+	nraw = function()
+	{
+		warnRef.css("visibility", "hidden");
+	}
+
+	drawProgressbar = function()
+	{
+		pbuff += "|";
+		if(200 < tick){
+			pbuff = "";
+			tick = 0;
+		}
+		progressRef.html(pbuff);
+		tick +=1;	
+	}
+
+	deleteCreds = function()
+	{
+		input = jQuery("#idinput").val();
+		if(input != cid){
+			jQuery("#idinput").val("");
+			return;
+		}
+		url = "/deletecreds/" +ctype +"/" +cid;
+		progressbarInterval = setInterval(drawProgressbar, 100);	
+		jQuery.get(url, function(data){
+			rbuff = data.message; 
+			rbuff += "<p/>";
+			rbuff += "<p/>";
+			rbuff += '<a class="btn" href="javascript:nraw()">Close</a>';
+			resultRef.html(rbuff);
+			clearInterval(progressbarInterval);
+		});
+	}
+});
+
+</script>
+
+<style type="text/css">
+
+.res {
+	border: 1px solid #ccccdd; 
+	border-radius: 9px; 
+	padding: 12px; 
+	margin-bottom: 12px;
+}
+
+.res ul { 
+	list-style: none; 
+	margin-bottom: 8px;
+}
+
+#warn {
+	border-radius: 9px;
+	border: solid 1px #ccddee;  
+	background-color: #ffffff;
+	position: absolute;
+	visibility: hidden;
+	left: 0px;
+	top: 0px;
+	width: 700px;
+	height: 340px;	
+	color: #000000;
+	margin: 16px; 
+	padding: 16px;
+	font-size: 14px;
+}
+
+#controls .btn, 
+#result .btn, 
+.res li .btn 
+{
+	text-decoration: none;
+	margin-right: 5px;
+	margin-top: 16px;
+	margin-bottom: 24px;
+	background-color: #006DCC;
+	background-image: linear-gradient(to bottom, #0088CC, #0044CC);
+	background-repeat: repeat-x;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	color: #FFFFFF;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	-moz-border-bottom-colors: none;
+	-moz-border-left-colors: none;
+	-moz-border-right-colors: none;
+	-moz-border-top-colors: none;
+	background-color: #F5F5F5;
+	background-image: linear-gradient(to bottom, #FFFFFF, #E6E6E6);
+	background-repeat: repeat-x;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) #B3B3B3;
+	border-image: none;
+	border-radius: 4px;
+	border-style: solid;
+	border-width: 1px;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+	color: #333333;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 14px;
+	line-height: 20px;
+	padding: 4px 12px;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+	vertical-align: middle;
+}
+
+</style>
+
+<div class="res">
+BENUTZER
+	{{#model.user}}
+	<ul>
+		<li>{{firstname}} {{lastname}}</li>
+		<li><img src="{{avatar_path}}"/></li>
+		<li>{{facebookID}}</li>
+		<li>{{email}}</li>
+		<li>{{gender}}</li>
+		<li>{{address}}</li>
+		<li>{{login_token}}</li>
+		<li>{{city}}</li>
+		<li>
+			<a class="btn" href="/object/{{id}}">Edit</a>
+			<a class="btn" href="javascript:warn('{{type}}','{{id}}')">Delete</a>
+		</li>
+	</ul>
+	{{/model.user}}
+</div>
+
+<div class="res">
+HUNDE
+	{{#model.dog}}
+	<ul>
+		<li>{{name}}</li>
+		<li><img src="{{avatar_path}}"/></li>
+		<li>{{gender}}</li>
+		<li>{{races}}</li>
+		<li>{{sterilized}}</li>
+		<li>{{gassis_per_day}}</li>
+		<li><a class="btn" href="/object/{{id}}">Edit</a></li>
+	</ul>
+	{{/model.dog}}
+</div>
+
+<div class="res">
+FREUNDE
+	{{#model.friend}}
+	<ul>
+		<li><a href="/creds?id={{id}}&type=user">{{firstname}} {{lastname}}</a></li>
+		<li><img src="{{avatar_path}}"/></li>
+		<li>{{email}}</li>
+		<li>{{login_token}}</li>
+		<li>{{facebookID}}</li>
+		<li>{{gender}}</li>
+		<li>{{address}}</li>
+		<li>{{city}}</li>
+		<li>{{why_i_live_dogs}}</li>
+		{{#push_devices}}
+			<li>{{type}}</li>
+			<li>{{id}}</li>
+			<li>{{token}}</li>
+		{{/push_devices}}
+		<li><a class="btn" href="/object/{{id}}">Edit</a></li>
+	</ul>
+	{{/model.friend}}
+</div>
+
+<div class="res">
+GASSICALLS
+	{{#model.gassicall}}
+	<ul>
+		<li>{{user_id}}</li>
+		<li>{{created}}</li>
+		<li>{{name}}</li>
+		<li>{{locations}}</li>
+		<li>{{length}}</li>
+		<li>{{begin_timestamp}}</li>
+		<li>{{end_timestamp}}</li>
+		{{#maps}}
+			{{#299x120}}
+				<li><img src="{{2x}}"/></li>
+			{{/299x120}}
+		{{/maps}}
+		<li><a class="btn" href="/object/{{id}}">Edit</a></li>
+	</ul>
+	{{/model.gassicall}}
+</div>
+
+<div class="res">
+RUTEN
+	{{#model.route}}
+	<ul>
+		<li>{{user_id}}</li>
+		<li>{{created}}</li>
+		<li>{{name}}</li>
+		<li>{{length}}</li>
+		<li>{{begin_timestamp}}</li>
+		<li>{{end_timestamp}}</li>
+		{{#maps}}
+			{{#299x120}}
+				<li><img src="{{2x}}"/></li>
+			{{/299x120}}
+		{{/maps}}
+		<li><a class="btn" href="/object/{{id}}">Edit</a></li>
+	</ul>
+	{{/model.route}}
+</div>
+
+<div class="res">
+NACHRICHTEN
+	{{#model.notification}}
+	<ul>
+		<li>{{user_id}}</li>
+		<li>{{object_id}}</li>
+		<li>{{event}}</li>
+		<li>{{to_users}}</li>
+		<li>{{message}}</li>
+		<li>{{created}}</li>
+		<li>{{deleted_by}}</li>
+		<li><a class="btn" href="/object/{{id}}">Edit</a></li>
+	</ul>
+	{{/model.notification}}
+</div>
+
+<div class="res">
+POIs
+	{{#model.poi}}
+	<ul>
+		<li>{{user_id}}</li>
+		<li>{{created}}</li>
+		<li>{{address}}</li>
+		<li>{{location}}</li>
+		<li>{{description}}</li>
+		<li>{{is_danger}}</li>
+		{{#hints}}
+			<li>{{text}}</li>
+			<li>{{created}}</li>
+			<li>{{id}}</li>
+			<li>{{created}}</li>
+		{{/hints}}
+		{{#maps}}
+			{{#299x120}}
+				<li><img src="{{2x}}"/></li>
+			{{/299x120}}
+		{{/maps}}
+		<li><a class="btn" href="/object/{{id}}">Edit</a></li>
+	</ul>
+	{{/model.poi}}
+</div>
+
+<div class="res">
+TREFFPUNKTE
+	{{#model.meetingpoint}}
+	<ul>
+		<li>{{user_id}}</li>
+		<li>{{friend_id}}</li>
+		<li>{{type}}</li>
+		<li>{{created}}</li>
+		<li>{{accepted}}</li>
+		<li>{{deleted}}</li>
+		<li><a class="btn" href="/object/{{id}}">Edit</a></li>
+	</ul>
+	{{/model.meetingpoint}}
+</div>
+
+<div class="res">
+PHOTOS
+	{{#model.photo}}
+	<ul>
+		<li><img src="{{path}}"/></li>
+		<li>{{id}}</li>
+		<li><a class="btn" href="/object/{{id}}">Edit</a></li>
+	</ul>
+	{{/model.photo}}
+</div>
+
+<div id="warn">
+<p/>
+Please type the id of the user you are about to delete.
+<p/>
+<p/>
+<input type="text" id="idinput"/>
+<p/>
+<div id="progress"></div>
+<p/>
+<p/>
+<div id="controls"><a class="btn" href="javascript:deleteCreds();">OK</a>&nbsp;<a class="btn" href="javascript:nraw();">Cancel</a></div>
+<p/>
+<p/>
+<div id="result"></div>
+</div>
