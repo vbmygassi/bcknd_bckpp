@@ -1,0 +1,33 @@
+{
+    "views": {
+    	"poiBySpecialID": {
+    		"map": "function(doc, meta) { if (doc.type == 'poi') { doc.specials.forEach(function(element) { emit(element.id, null); }); } }"
+    	},
+    	"premiumUserByInvitecode": {
+    		"map": "function(doc, meta) { if (doc.type == 'premium_user' && doc.invitecode) { emit(doc.invitecode, null); } }"
+    	},
+    	"premiumUserByEmail": {
+    		"map": "function(doc, meta) { if (doc.type == 'premium_user' && doc.email) { emit(doc.email, null); } }"
+    	}
+    },
+
+    "spatial": {
+        "poiByLocation": "
+function(doc) {\n 
+    if((doc.type == 'poi' || doc.type == 'gassicall' || doc.type == 'meetingpoint') && doc.location && !doc.canceled && !doc.is_deleted) {\n 
+        var now = Math.round(new Date().getTime() / 1000);\n
+        var type = doc.type;\n 
+        if (doc.date_end < now - 86400) {\n
+            return;\n
+        }\n
+        if(doc.is_danger) {\n 
+            type = 'danger';\n 
+        }\n 
+        if(doc.poi_type && doc.poi_type == 'premium') {\n 
+            type = 'premium'\n
+        }\n
+        emit({type: 'Point', coordinates: doc.location}, type);\n
+    }\n 
+}"
+    }
+}

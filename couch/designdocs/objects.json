@@ -1,0 +1,11 @@
+{
+    "views": {
+        "objectsByType": {
+            "map": "function (doc, meta) { emit(doc.type, null); }"
+        },
+        "objectCountByType": {
+            "map": "function (doc, meta) { emit(doc.type, null); }",
+            "reduce": "_count"
+        }
+    }
+}

@@ -1,0 +1,68 @@
+{
+    "views": {
+        "objectsById": {
+            "map": "function (doc, meta) { emit(meta.id, null); }"
+        },
+        "usersByEmail": {
+            "map": "function (doc, meta) { if(doc.type == 'user') { emit(doc.email, null);  } }"
+        },
+        "usersByFacebookID": {
+            "map": "function (doc, meta) { if(doc.type == 'user' && doc.facebookID) { emit(doc.facebookID, null); } }"
+        },
+        "usersByLoginToken": {
+            "map": "function (doc, meta) { if(doc.type == 'user' && doc.login_token) { emit(doc.login_token, null);  } }"
+        },
+        "usersByPasswordToken": {
+            "map": "function (doc, meta) { if(doc.type == 'user' && doc.password_token) { emit(doc.password_token, null); } }"
+        },
+        "friendships": {
+            "map": "function (doc, meta) { if(doc.type == 'friendship') { emit([doc.user_id, doc.friend_id], null); emit([doc.friend_id, doc.user_id], null); } }"
+        },
+        "friendshipsAccepted": {
+            "map": "function (doc, meta) { if(doc.type == 'friendship' && doc.accepted && !doc.deleted) { emit([doc.user_id, doc.friend_id], null); emit([doc.friend_id, doc.user_id], null); } }"
+        },
+
+        "actionsByUserId": {
+            "map": "
+function (doc, meta) {\n
+    var now = Math.round(new Date().getTime() / 1000);\n
+    if (doc.created > now - 259200) {\n
+        if(doc.type == 'route' || doc.type ==  'meetingpoint' || doc.type ==  'gassicall' || doc.type == 'poi' ||\n 
+            (doc.type ==  'photo' && !doc.route_id) ||\n 
+            (doc.type == 'notification' && (doc.event == 'new_photo_like'  || doc.event == 'event_dogsitter' || doc.event == 'event_like_offer'))) {\n 
+            if(doc.is_deleted || doc.deleted || doc.canceled) {\n
+                return\n
+            }\n
+            emit(String(doc.user_id), doc.type);\n
+        } else if(doc.type == 'offer' && doc.is_stream_product) {\n 
+            emit('offer_key', doc.type)\n
+        }\n
+    }\n
+}"
+        },
+
+        "notificationsByObjectId": {
+            "map": "function (doc, meta) { if(doc.type == 'notification' && doc.object_id) { emit(doc.object_id, null) } }"
+        },
+
+        "notificationsByUserId": {
+            "map": "
+function (doc, meta) {\n 
+    var now = Math.round(new Date().getTime() / 1000);\n
+    if(doc.type == 'notification' && doc.to_users && doc.to_users.length && doc.created > now - 604800) { \n
+        for(var i = 0; i < doc.to_users.length; i++) { \n
+            if(doc.to_users[i]) {\n
+                emit([String(doc.to_users[i]), doc.created], null)\n 
+            }\n
+        }\n 
+    }\n
+}"
+        }
+    },
+
+    "spatial": {
+        "dogsitterByLocation": "function(doc) { if(doc.type == 'user' && doc.is_dogsitter && doc.dogsitter_location) { emit({type: 'Point', coordinates: doc.dogsitter_location}, null); } }",
+        "userByCurrentLocation": "function(doc) { if(doc.type == 'user' && doc.current_location) { emit({type: 'Point', coordinates: doc.current_location}, null); } }"
+    }
+
+}

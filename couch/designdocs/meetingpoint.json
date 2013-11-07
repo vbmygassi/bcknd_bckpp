@@ -1,0 +1,10 @@
+{
+	"views": {
+		"meetingpointByUserID": {
+			"map": "function (doc, meta) {if (doc.type == 'meetingpoint' && !doc.canceled && !doc.is_public) { emit(doc.user_id, null); }}"
+		},
+		"publicMeetingpoints": {
+			"map": "function (doc, meta) {if (doc.type == 'meetingpoint' && !doc.canceled && doc.is_public) { emit(null, null); }}"
+		}
+	}
+}

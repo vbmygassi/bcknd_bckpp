@@ -1,0 +1,50 @@
+{
+
+    "views": {
+        "gassicallsByUserId": {
+            "map": "
+function(doc) {\n
+    var now = Math.round(new Date().getTime() / 1000);\n
+    if(doc.type == 'gassicall' && doc.user_id && !doc.is_deleted && doc.date_end > now - 86400) {\n
+        emit(doc.user_id, null);\n
+    }\n
+}"
+        },
+
+        "gassicallsByAppliedUserId": {
+            "map": "
+function(doc) {\n 
+    var now = Math.round(new Date().getTime() / 1000);\n
+    if(doc.type == 'gassicall' && doc.applications && !doc.is_deleted && doc.date_end > now - 86400) {\n 
+        for(var i in doc.applications) {\n 
+            if (doc.applications[i].status != 'accepted') {\n 
+                emit(doc.applications[i].user_id, null);\n 
+            }\n 
+        }\n 
+    }\n 
+}"
+            },
+        "gassicallsByConfirmedUserId": {
+            "map": "
+function(doc) {\n
+    var now = Math.round(new Date().getTime() / 1000);\n
+    if(doc.type == 'gassicall' && doc.applications && !doc.is_deleted && !doc.is_deleted && doc.date_end > now - 86400) {\n
+        for(var i in doc.applications) {\n 
+            if (doc.applications[i].status == 'accepted') {\n 
+                emit(doc.applications[i].user_id, null);\n 
+            }\n  
+        }\n 
+    }\n 
+}"
+        }
+    },
+    "spatial": {
+        "gassicallsByLocation":  "
+function(doc) {\n
+    var now = Math.round(new Date().getTime() / 1000);\n
+    if(doc.type == 'gassicall' && doc.location && !doc.is_deleted && doc.date_end > now - 86400) {\n
+        emit({type: 'Point', coordinates: doc.location}, null);\n 
+    }\n
+}"
+    }
+}

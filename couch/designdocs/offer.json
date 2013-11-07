@@ -1,0 +1,14 @@
+{
+	"views": {
+		"offersByID": {
+			"map": "function (doc, meta) {if (doc.type == 'offer' && !doc.is_deleted) { emit(meta.id, null); }}"
+		},
+		"topOffersByID": {
+			"map": "function (doc, meta) {if (doc.type == 'offer' && !doc.is_deleted && doc.is_top_product) { emit(meta.id, null); }}"
+		},
+		"categories": {
+			"map": "function (doc, meta) {if (doc.type == 'offer' && doc.category_id && !doc.is_deleted) { emit(doc.category_id, doc.category_name); }}",
+			"reduce": "function(key, values, rereduce) { return (values[0]); }"
+		}
+	}
+}

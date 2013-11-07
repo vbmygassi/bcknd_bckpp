@@ -1,0 +1,7 @@
+{
+	"views": {
+		"adminsByUsername": {
+			"map": "function (doc, meta) {if (doc.type == 'admin') { emit(doc.username, null); }}"
+		}
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"views": {
+		"dogsByUserID": {
+			"map": "function (doc, meta) {if (doc.type == 'dog') { emit(doc.user_id, null); }}"
+		}
+	}
+}

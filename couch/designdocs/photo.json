@@ -1,0 +1,10 @@
+{
+	"views": {
+		"photosByUserId": {
+			"map": "function (doc, meta) {if (doc.type == 'photo' && !doc.deleted) { emit(doc.user_id, null); }}"
+		},
+		"photosByRouteId": {
+			"map": "function (doc, meta) {if (doc.type == 'photo' && !doc.deleted && doc.route_id) { emit(doc.route_id, null); }}"
+		}
+	}
+}
