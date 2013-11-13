@@ -32,41 +32,34 @@ require("request")("http://127.0.0.1:8092/default/_design/export/_view/user?conn
 			return false;
 		}
 		res = JSON.parse(body);
-		for(index in res.rows){
-			doc = res.rows[index];
-			console.log("........................................");
-			console.log(doc);
-			console.log("//////////////////////////////////////////");
-			console.log(index);
-			console.log("   .");
-			/*
-			if(null == doc.id){
-				console.log("no doc id: ");
-				console.log(doc);
-				continue;
-			}
-			*/
-			// i add the doc key to the index: 
-			// the idea is: find a string (elastical) and return the "key" so i can download the doc from "couch"
-			// rather then "contents" of a document
-			doc.value.meta = doc.key;
-			// -->
-			client.index("default", "default", doc.value, function(err, result, res){
-				if(err){
-					console.log("error while indexing: ");
-					console.log(err);
-					console.log(doc);
-				}
-				if(result){
-					console.log("result: ");
-					console.log(result);
-				}
-				if(res){
-					console.log("res: ");
-					console.log(res);
-				}
-			});
-		}
+		index(res.rows);
 	}
 );
+
+index = function(coll)
+{
+	doc = coll.pop();
+	if(null == doc){
+		process.exit();
+	}
+	console.log("........................................");
+	console.log(doc);
+	doc.value.meta = doc.key;
+	client.index("default", "default", doc.value, function(err, result, res){
+		if(err){
+			console.log("error while indexing: ");
+			console.log(err);
+			console.log(doc);
+		}
+		if(result){
+			console.log("result: ");
+			console.log(result);
+			index(coll);
+		}
+		if(res){
+			console.log("res: ");
+			console.log(res);	
+		}
+	});
+}
 
