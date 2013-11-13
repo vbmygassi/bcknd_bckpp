@@ -12,7 +12,9 @@
  export : user 
 	===
 	function (doc, meta){
-		emit(meta, doc);
+		if("user" == doc.type){
+			emit(meta, doc);
+		}
 	}
 
                                                      */
