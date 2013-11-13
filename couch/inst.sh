@@ -6,7 +6,7 @@ curl -X PUT -H 'Content-Type: application/json' http://viktor:Kn3#80r9@localhost
 		"number_of_shards": 1
 	},
 	"mappings": {
-		"default": {
+		"usercreds": {
 			"_source": {
 				"includes": ["meta"]
 			},	
